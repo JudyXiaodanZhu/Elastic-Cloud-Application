@@ -1,0 +1,32 @@
+{% extends "index.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block head %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{ url_for('static', filename='./css/thumbnail-gallery.css') }}">
+{% endblock %}
+  <body>
+{% block content %}
+    <!-- Page Content -->
+    <div class="container">
+      <h1 class="my-4 text-center text-lg-left">Photo Gallery</h1>
+                {% with messages = get_flashed_messages() %}
+         {% if messages %}
+               {% for message in messages %}
+               <p>{{ message }}</p>
+               {% endfor %}
+         {% endif %}
+      {% endwith %}
+      <div class="row text-center text-lg-left">
+          <br>
+          {%for name in filename%}
+        <div class="col-lg-3 col-md-4 col-xs-6">
+          <a href="#" class="d-block mb-4 h-100">
+            <img class="img-fluid img-thumbnail" src="static/img/{{name[0]|thumbnail('400x300',crop='fit')}}" alt="">
+          </a>
+        </div>
+          {%endfor%}
+      </div>
+
+    </div>
+    <!-- /.container -->
+{% endblock %}
