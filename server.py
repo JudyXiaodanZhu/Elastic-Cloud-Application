@@ -1,6 +1,11 @@
+#from urllib.parse import urlparse, urljoin
+
+#!/usr/bin/env python
+# -*- coding: utf-8 -*- 
+import sqlite3
 import os
 from flask import Flask,request, flash, redirect, render_template,url_for,abort
-from urllib.parse import urlparse, urljoin
+from urlparse import urlparse, urljoin
 from flask_login import LoginManager,login_user,logout_user,current_user,login_required
 from passlib.hash import pbkdf2_sha256
 import database
