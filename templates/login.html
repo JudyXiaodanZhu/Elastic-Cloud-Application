@@ -24,9 +24,6 @@
                 <input type="password" id="inputPassword" name="password" class="form-control" placeholder="Password" required>
                 <button class="btn btn-lg btn-primary btn-block btn-signin" type="submit">Sign in</button>
             </form><!-- /form -->
-            <a href="#" class="forgot-password">
-                Forgot the password?
-            </a>
             {% for message in form.email.errors %}
             <p style="color:black">{{ message }}</p>
             {% endfor %}

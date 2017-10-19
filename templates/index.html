@@ -22,6 +22,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='./css/landing-page.css') }}">
 
     <!-- Custom styles for this template -->
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='./css/lightbox.min.css') }}"/>
+
     {% endblock %}
   </head>
 
@@ -99,7 +101,7 @@
               for providing the photographs that you see on our home page. Visit their website to become a member.</p>
           </div>
           <div class="col-lg-5 mr-auto">
-            <img class="img-fluid" src="{{ url_for('static', filename='./img/ipad.png') }}" alt="">
+            <img class="img-fluid" src="{{ url_for('static', filename='./imges/ipad.png') }}" alt="">
           </div>
         </div>
 
@@ -120,7 +122,7 @@
               <a target="_blank" href="http://www.psdcovers.com/">PSDCovers</a>! Visit their website to download some of their awesome, free photoshop actions!</p>
           </div>
           <div class="col-lg-5 ml-auto order-lg-1">
-            <img class="img-fluid" src="{{ url_for('static', filename='./img/dog.png') }}" alt="">
+            <img class="img-fluid" src="{{ url_for('static', filename='./imges/dog.png') }}" alt="">
           </div>
         </div>
 
@@ -209,8 +211,9 @@
     </footer>
 
     <!-- Bootstrap core JavaScript -->
-    <script src="{{ url_for('static', filename='./vendor/jquery/jquery.js') }}"></script>
-    <script src="{{ url_for('static', filename='./vendor/jquery/jquery.min.js') }}"></script>
+<script src="{{ url_for('static', filename='./js/lightbox-plus-jquery.min.js') }}"></script>
+<script src="{{ url_for('static', filename='./vendor/jquery/jquery.min.js') }}"></script>
+
     <script src="{{ url_for('static', filename='./vendor/popper/popper.min.js') }}"></script>
     <script src="{{ url_for('static', filename='./vendor/bootstrap/js/bootstrap.min.js') }}"></script>
 

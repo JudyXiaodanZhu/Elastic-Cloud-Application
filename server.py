@@ -9,7 +9,6 @@ import database
 
 from werkzeug.utils import secure_filename
 from wand.image import Image
-import sys
 from flask_thumbnails_wand import Thumbnail
 
 file_path = os.path.abspath(os.getcwd())+"\database.db"
@@ -161,5 +160,3 @@ def is_safe_url(target):
 if __name__ == "__main__":
     # execute only if run as a script
     app.run()
-
-    #to-do: forgot password, display transformations,deploy,url to auto upload photo,documentation
