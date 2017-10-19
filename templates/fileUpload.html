@@ -1,0 +1,33 @@
+
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>uploadForm</title>
+  </head>
+
+  <body>
+
+    <h2>Upload Form</h2>
+    {% with messages = get_flashed_messages() %}
+         {% if messages %}
+               {% for message in messages %}
+               <p>{{ message }}</p>
+               {% endfor %}
+         {% endif %}
+      {% endwith %}
+
+     <form id="form" enctype="multipart/form-data" method="post" action="">
+       User ID <input type="string" name="email"><br />
+       Password <input type="password" name="password"><br />
+   	What is the image files to upload? <input type="file" name=file><br />
+   	<input type="submit" value="Upload">
+	<input type="reset">
+    </form>
+{% for message in form.email.errors %}
+            <p style="color:black">{{ message }}</p>
+            {% endfor %}
+            {% for message in form.password.errors %}
+            <p style="color:black"> {{ message }}</p>
+            {% endfor %}
+  </body>
+</html>

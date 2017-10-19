@@ -1,12 +1,9 @@
-import sqlite3
 import os
-from flask import Flask,request, flash, redirect, render_template,url_for,abort,make_response
+from flask import Flask,request, flash, redirect, render_template,url_for,abort
 from urllib.parse import urlparse, urljoin
 from flask_login import LoginManager,login_user,logout_user,current_user,login_required
-from flask_sqlalchemy import SQLAlchemy
 from passlib.hash import pbkdf2_sha256
 import database
-
 from werkzeug.utils import secure_filename
 from wand.image import Image
 from flask_thumbnails_wand import Thumbnail
@@ -33,20 +30,6 @@ def index():
     if current_user.is_authenticated:
         return redirect(url_for('home'));
     return render_template('index.html');
-
-
-@app.route('/dashboard')
-@login_required
-def home():
-    img=Img.query.filter_by(user_email=current_user.email)
-    filename = []
-    inputs = []
-    if img:
-        for field in img:
-            inputs = [field.img_name,field.img_trans1,field.img_trans2,field.img_trans3]
-            filename.append(inputs)
-        print(filename)
-    return render_template('dashboard.html',filename=filename)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -89,6 +72,48 @@ def logout():
     db.session.commit()
     logout_user()
     return redirect(url_for('index'))
+
+@app.route('/dashboard')
+@login_required
+def home():
+    img=Img.query.filter_by(user_email=current_user.email)
+    filename = []
+    inputs = []
+    if img:
+        for field in img:
+            inputs = [field.img_name,field.img_trans1,field.img_trans2,field.img_trans3]
+            filename.append(inputs)
+        print(filename)
+    return render_template('dashboard.html',filename=filename)
+
+@app.route('/test/FileUpload',methods=['GET','POST'])
+def test():
+    form = LoginForm(request.form)
+    if request.method == 'POST' and form.validate():
+        user = User.query.get(form.email.data)
+        if not user:
+            return render_template('fileUpload.html')
+        if 'file' not in request.files:
+            flash('No file part')
+            return redirect(request.url)
+        file = request.files['file']
+        print(file.filename)
+        # if user does not select file, browser also
+        # submit a empty part without filename
+        if file.filename == '':
+            flash('No selected file')
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            fname = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(fname)
+            ftrans = transform(filename, fname)
+            flash('Photo Uploaded!')
+            img = Img(filename, user.email, ftrans[0], ftrans[1], ftrans[2])
+            db.session.add(img)
+            db.session.commit()
+        return render_template('fileUpload.html',form=form)
+    return render_template('fileUpload.html',form=form)
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
