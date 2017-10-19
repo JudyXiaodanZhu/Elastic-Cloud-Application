@@ -1,7 +1,9 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*- 
 import sqlite3
 import os
 from flask import Flask,request, flash, redirect, render_template,url_for,abort,make_response
-from urllib.parse import urlparse, urljoin
+from urlparse import urlparse, urljoin
 from flask_login import LoginManager,login_user,logout_user,current_user,login_required
 from flask_sqlalchemy import SQLAlchemy
 from passlib.hash import pbkdf2_sha256
