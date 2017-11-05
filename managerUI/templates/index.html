@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    {% block head %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>{% block title %}{% endblock %}Landing Page - Start Bootstrap Theme</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='./vendor/bootstrap/css/bootstrap.min.css') }}">
+
+    <!-- Custom fonts for this template -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='./vendor/font-awesome/css/font-awesome.min.css') }}">
+
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
+
+    <!-- Custom styles for this template -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='./css/landing-page.css') }}">
+
+    {% endblock %}
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+      <div class="container">
+          <a class="navbar-brand" href="/">Manager UI</a>
+      </div>
+    </nav>
+
+{% block content %}
+
+    {% endblock %}
+    <!-- Footer -->
+    <footer>
+      <div class="container">
+        <ul class="list-inline">
+          <li class="list-inline-item">
+            <a href="/">Home</a>
+          </li>
+          <li class="list-inline-item">
+            <a href="http://www.cs.toronto.edu/~delara/courses/ece1779/#home">Course Web Page</a>
+          </li>
+        </ul>
+        <p class="copyright text-muted small">Copyright &copy; Your Company 2017. All Rights Reserved</p>
+      </div>
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+<script src="{{ url_for('static', filename='./vendor/jquery/jquery.min.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='./vendor/popper/popper.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='./vendor/bootstrap/js/bootstrap.min.js') }}"></script>
+
+  </body>
+
+</html>

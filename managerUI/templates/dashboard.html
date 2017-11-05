@@ -1,0 +1,63 @@
+{% extends "index.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block head %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{ url_for('static', filename='./css/thumbnail-gallery.css') }}">
+{% endblock %}
+  <body>
+{% block content %}
+    <!-- Page Content -->
+    <div class="container">
+      <h1 class="my-4 text-center text-lg-left">Manager UI</h1>
+                {% with messages = get_flashed_messages() %}
+         {% if messages %}
+               {% for message in messages %}
+               <p>{{ message }}</p>
+               {% endfor %}
+         {% endif %}
+      {% endwith %}
+      <div class="row text-center text-lg-left">
+          <br>
+           <h2>List workers</h2>
+                    <hr>
+          <table>
+              <tr>
+                 <th>Worker name</th>
+                  <th>CPU utilization</th>
+              </tr>
+               {% for worker in workers%}
+                <tr>
+                    <td>{{ worker.name}}</td>
+                    <td>{{worker.cpu}}</td>
+                </tr>
+          {%endfor%}
+          </table>
+
+          <h2>Change Worker Pool Size</h2>
+             <hr>
+              <form id="modify_pool_size" enctype="multipart/form-data" method="post" action="/change">
+            <input type="radio" name="modify_pool" value="up"> Grow worker pool by 1<br>
+            <input type="radio" name="modify_pool" value="down"> Shrink worker pool by 1<br>
+                  <input type="submit" value="submit">
+            </form>
+
+          <h2>Auto-scaling</h2>
+           <hr>
+          <p>Please set the following parameters: </p>
+          <form id="auto-scaling" enctype="multipart/form-data" method="post" action="/scale">
+              CPU threshold for growing the worker pool <input type="number" name="grow_cpu" required><br />
+             CPU threshold for shrinking the worker pool <input type="number" name="shrink_cpu" required><br />
+              Ratio by which to expand the worker pool <input type="number" name="grow_ratio" required><br />
+             Ratio by which to shrink the worker pool  <input type="number" name="shrink_ratio" required><br />
+             <input type="submit" value="submit">
+            </form>
+
+          <h2>Delete Data</h2>
+           <hr>
+            <form id="delete" enctype="multipart/form-data" method="post" action="/delete">
+              <input type="submit" value="Please click to delete all data.">
+            </form>
+      </div>
+    </div>
+    <!-- /.container -->
+{% endblock %}
