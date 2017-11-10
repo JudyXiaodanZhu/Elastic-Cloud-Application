@@ -1,6 +1,6 @@
 from wtforms import StringField, Form, PasswordField,validators
 from passlib.hash import pbkdf2_sha256
-from model import User
+from model import Users
 
 
 class RegistrationForm(Form):
@@ -24,7 +24,7 @@ class RegistrationForm(Form):
         if not rv:
             return False
 
-        user = User.query.filter_by(email=self.email.data).first()
+        user = Users.query.filter_by(email=self.email.data).first()
         if user is not None:
             self.email.errors.append('Email in use.')
             return False
@@ -46,14 +46,13 @@ class LoginForm(Form):
         if not rv:
             return False
 
-        user = User.query.get(self.email.data)
+        user = Users.query.get(self.email.data)
         if user is None:
-            self.username.errors.append('Unknown username')
+            self.email.errors.append('Unknown username')
             return False
 
         if not pbkdf2_sha256.verify(self.password.data, user.password):
             self.password.errors.append('Invalid password')
             return False
-
         self.user = user
         return True

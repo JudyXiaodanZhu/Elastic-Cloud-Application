@@ -2,28 +2,81 @@
 {% block title %}Dashboard{% endblock %}
 {% block head %}
   {{ super() }}
-  <link rel="stylesheet" href="{{ url_for('static', filename='./css/thumbnail-gallery.css') }}">
+<style>
+input[type=text], select {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+input[type=submit] {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 15px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+input[type=submit]:hover {
+    background-color: #45a049;
+}
+
+input[type=number] {
+  display: block;
+  border: 1px solid #999;
+  -webkit-box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
+}
+#customers {
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+#customers td, #customers th {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+#customers tr:nth-child(even){background-color: #f2f2f2;}
+
+#customers tr:hover {background-color: #ddd;}
+
+#customers th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #4CAF50;
+    color: white;
+}
+</style>
 {% endblock %}
   <body>
 {% block content %}
     <!-- Page Content -->
     <div class="container">
-      <h1 class="my-4 text-center text-lg-left">Manager UI</h1>
+        <br><br>
                 {% with messages = get_flashed_messages() %}
          {% if messages %}
                {% for message in messages %}
-               <p>{{ message }}</p>
+               <p style="color:red;">{{ message }}</p>
                {% endfor %}
          {% endif %}
       {% endwith %}
-      <div class="row text-center text-lg-left">
-          <br>
            <h2>List workers</h2>
                     <hr>
-          <table>
+          <br>
+          <table id="customers">
               <tr>
                  <th>Worker name</th>
-                  <th>CPU utilization</th>
+                  <th>CPU utilization (10 min avg)</th>
               </tr>
                {% for worker in workers%}
                 <tr>
@@ -32,32 +85,37 @@
                 </tr>
           {%endfor%}
           </table>
-
+        <br><br>
           <h2>Change Worker Pool Size</h2>
              <hr>
               <form id="modify_pool_size" enctype="multipart/form-data" method="post" action="/change">
-            <input type="radio" name="modify_pool" value="up"> Grow worker pool by 1<br>
-            <input type="radio" name="modify_pool" value="down"> Shrink worker pool by 1<br>
+            <input class="radio-btn" type="radio" name="modify_pool" value="up"> Grow worker pool by 1<br>
+            <input class="radio-btn" type="radio" name="modify_pool" value="down"> Shrink worker pool by 1<br>
                   <input type="submit" value="submit">
             </form>
-
+          <br><br>
           <h2>Auto-scaling</h2>
            <hr>
-          <p>Please set the following parameters: </p>
+          <h5>Please enter the following parameters: </h5>
+        <br>
           <form id="auto-scaling" enctype="multipart/form-data" method="post" action="/scale">
-              CPU threshold for growing the worker pool <input type="number" name="grow_cpu" required><br />
-             CPU threshold for shrinking the worker pool <input type="number" name="shrink_cpu" required><br />
-              Ratio by which to expand the worker pool <input type="number" name="grow_ratio" required><br />
-             Ratio by which to shrink the worker pool  <input type="number" name="shrink_ratio" required><br />
+              CPU threshold for growing the worker pool: &nbsp;&nbsp;&nbsp;
+              <input type="number", step = 0.01 name="grow_cpu" placeholder="0.00-100.00"><br />
+             CPU threshold for shrinking the worker pool:&nbsp;&nbsp;&nbsp;
+              <input type="number", step = 0.01 name="shrink_cpu" placeholder="0.00-100.00"><br />
+              Ratio by which to expand the worker pool:&nbsp;&nbsp;&nbsp;
+              <input type="number" name="grow_ratio" placeholder="Enter an integer"><br />
+             Ratio by which to shrink the worker pool:&nbsp;&nbsp;&nbsp;
+              <input type="number" name="shrink_ratio" placeholder="Enter an integer"><br />
              <input type="submit" value="submit">
             </form>
-
+          <br><br>
           <h2>Delete Data</h2>
            <hr>
             <form id="delete" enctype="multipart/form-data" method="post" action="/delete">
-              <input type="submit" value="Please click to delete all data.">
+              <input type="submit" value="Please click to delete all data">
             </form>
-      </div>
+          <br><br>
     </div>
     <!-- /.container -->
 {% endblock %}

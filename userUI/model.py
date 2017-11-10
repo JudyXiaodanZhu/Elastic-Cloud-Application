@@ -1,9 +1,9 @@
-from sqlalchemy import Column, Integer,ForeignKey, String
+from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
 from database import db
 
 
-class User(db.Model):
+class Users(db.Model):
     __tablename__ = 'Users'
 
     email = db.Column(db.String(40), primary_key=True, unique=True, nullable=False)
@@ -39,7 +39,7 @@ class Img(db.Model):
     __tablename__ = 'Img'
 
     img_name = db.Column(db.String(80), primary_key=True, unique=True, nullable=False)
-    user_email = db.Column(db.String(80), ForeignKey('User.email'), unique=False, nullable=False)
+    user_email = db.Column(db.String(80), ForeignKey('Users.email'), primary_key=True, unique=False, nullable=False)
     img_trans1 = db.Column(db.String(80), unique=False, nullable=True)
     img_trans2 = db.Column(db.String(80), unique=False, nullable=True)
     img_trans3 = db.Column(db.String(80), unique=False, nullable=True)
@@ -54,10 +54,3 @@ class Img(db.Model):
         self.img_trans1 = trans1
         self.img_trans2 = trans2
         self.img_trans3 = trans3
-
-
-def init_db():
-    db.create_all()
-
-if __name__ == '__main__':
-    init_db()
