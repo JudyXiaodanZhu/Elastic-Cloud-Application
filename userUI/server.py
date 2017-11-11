@@ -15,10 +15,8 @@ app.config.from_pyfile('config.cfg')
 database.init_db(app)
 db = database.db
 thumb = Thumbnail(app)
-s3 = boto3.resource('s3', aws_access_key_id='AKIAIDMH5U4PYNAACSKA',
-                    aws_secret_access_key='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')
-client = boto3.client('s3', aws_access_key_id='AKIAIDMH5U4PYNAACSKA',
-                      aws_secret_access_key='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')
+s3 = boto3.resource('s3')
+client = boto3.client('s3')
 
 # set login manager parameters
 login_manager = LoginManager()

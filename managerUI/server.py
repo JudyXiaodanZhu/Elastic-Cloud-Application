@@ -7,43 +7,63 @@ from apscheduler.triggers.interval import IntervalTrigger
 
 
 def monitor():
-    # checks every fifteen seconds if resizing is needed
-        # extract the parameters from the db
-        cur.execute("SELECT * FROM auto_scale")
-        row = cur.fetchone()
-        if row:
-            upper_threshold = row[0]
-            lower_threshold = row[1]
-            grow_ratio = row[2]
-            shrink_ratio = row[3]
-        else:
-            print("No data in the auto_scale table.\n")
-        print("In monitor")
-        # resize pool based on the current thresholds
-        instance_num = resize_pool(upper_threshold, lower_threshold)
-        print(instance_num)
-        # determine how many new instances need to be added or subtracted
-        add_instance_num = grow_ratio * instance_num - instance_num
-        subtract_instance_num = instance_num - instance_num / shrink_ratio
-        delta_instance_num = abs(add_instance_num - subtract_instance_num)
+    # extract the parameters from the db
+    cur.execute("SELECT * FROM auto_scale")
+    row = cur.fetchone()
+    if row:
+        upper_threshold = row[0]
+        lower_threshold = row[1]
+        grow_ratio = row[2]
+        shrink_ratio = row[3]
+    else:
+        print("No data in the auto_scale table.\n")
+    print("In monitor")
 
-        # create or terminate the instances and resize the pool
-        if add_instance_num > subtract_instance_num:
-            for i in range(int(delta_instance_num)):
-                create_instance()
-        elif add_instance_num < subtract_instance_num:
-            for i in range(int(delta_instance_num)):
-                terminate_instance()
-        instance_num = resize_pool(upper_threshold, lower_threshold)
-        print(instance_num)
-        if instance_num:
-            flash("Worker pool resize based on threshold.")
-        # reset the growing and shrinking ratios in the db
-        set_auto_scale(upper_threshold, lower_threshold, 1, 1)
+    # resize pool based on the current thresholds
+    cpu_sum = 0
+    instance_num = 0
+    add_instance_num = 0
+    subtract_instance_num = 0
+
+    re = get_cloud_metric()
+    for item in re:
+        if item['cpu'] != 0:
+            cpu_sum += item['cpu']
+            instance_num += 1
+
+    print(instance_num)
+    # determine how many new instances need to be added or subtracted
+    if grow_ratio != 1:
+        add_instance_num = grow_ratio * instance_num - instance_num
+    if shrink_ratio != 1:
+        subtract_instance_num = instance_num - instance_num / shrink_ratio
+
+    if cpu_sum > upper_threshold:
+        add_instance_num += 1
+    if cpu_sum < lower_threshold:
+        subtract_instance_num += 1
+
+    delta_instance_num = abs(add_instance_num - subtract_instance_num)
+
+    # create or terminate the instances and resize the pool
+    if add_instance_num > subtract_instance_num:
+        for i in range(int(delta_instance_num)):
+            create_instance()
+    elif add_instance_num < subtract_instance_num:
+        for i in range(int(delta_instance_num)):
+            terminate_instance()
+
+    if delta_instance_num != 0:
+        print("Worker pool resize based on threshold.")
+
+    # reset the growing and shrinking ratios in the db
+    set_auto_scale(upper_threshold, lower_threshold, 1, 1)
+
 
 sched = BackgroundScheduler(daemon=True)
-#sched.add_job(monitor, 'interval', seconds=10)
-#sched.start()
+# checks every fifteen seconds if resizing is needed
+sched.add_job(monitor, 'interval', seconds=15)
+sched.start()
 
 db = pymysql.connect("172.31.82.239", "ece1779", "secret", "ece1779")
 # initializes app and connect to db
@@ -51,14 +71,10 @@ app = Flask(__name__)
 cur = db.cursor()
 app.config.from_pyfile('config.cfg')
 # connect to ec2, s3, elb using boto3
-s3 = boto3.resource('s3', region_name='us-east-1', aws_access_key_id='AKIAIDMH5U4PYNAACSKA',
-                    aws_secret_access_key='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')
-ec2 = boto3.resource('ec2', region_name='us-east-1', aws_access_key_id='AKIAIDMH5U4PYNAACSKA',
-                    aws_secret_access_key='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')
-lb = boto3.client('elb', region_name='us-east-1', aws_access_key_id='AKIAIDMH5U4PYNAACSKA',
-                    aws_secret_access_key='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')
-cloud = boto3.client('cloudwatch', region_name='us-east-1', aws_access_key_id='AKIAIDMH5U4PYNAACSKA',
-                     aws_secret_access_key='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')
+s3 = boto3.resource('s3')
+ec2 = boto3.resource('ec2')
+lb = boto3.client('elb')
+cloud = boto3.client('cloudwatch')
 
 
 @app.route('/')
@@ -129,18 +145,6 @@ def delete():
     return redirect(url_for('index'))
 
 
-def calculate_total_cpu():
-    """
-    Calculate the total CPU utilization for all workers. 
-    :return: [integer, integer] for total CPU and number of running instances.
-    """
-    re = get_cloud_metric()
-    inst_num = len(re)
-    cpu_sum = sum(re['cpu']) / max(inst_num, 1)
-    print([cpu_sum, inst_num])
-    return [cpu_sum, inst_num]
-
-
 def create_instance():
     """
     Grow the worker pool by creating a new instance.
@@ -153,7 +157,7 @@ def create_instance():
     ./run.sh
     """
     instance = ec2.create_instances(
-        ImageId='ami-9c6dd3e6',
+        ImageId='ami-397ac343',
         InstanceType='t2.micro',
         KeyName='ece1779',
         MaxCount=1,
@@ -185,25 +189,6 @@ def terminate_instance():
         ec2.instances.filter(InstanceIds=[inst_id]).terminate()
         return True
     return False
-
-
-def resize_pool(upper_threshold, lower_threshold):
-    """
-    Resize the worker pool by calculating the CPU utilization and checks if it meets the upper and lower 
-    threshold. 
-    :param upper_threshold: float 
-    :param lower_threshold: float
-    :return: int the number of running instances
-    """
-    cpu_sum, inst_num = calculate_total_cpu()
-    while cpu_sum > upper_threshold:
-        terminate_instance()
-        cpu_sum, inst_num = calculate_total_cpu()
-
-    while cpu_sum < lower_threshold:
-        create_instance()
-        cpu_sum, inst_num = calculate_total_cpu()
-    return inst_num
 
 
 def set_auto_scale(upper, lower, grow, shrink):
@@ -259,7 +244,7 @@ def get_cloud_metric():
         else:
             inst = {
                     'name': instance.id,
-                    'cpu': "Collecting data."
+                    'cpu': 0
                 }
             re.append(inst)
     return re
