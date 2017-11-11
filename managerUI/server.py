@@ -51,14 +51,10 @@ app = Flask(__name__)
 cur = db.cursor()
 app.config.from_pyfile('config.cfg')
 # connect to ec2, s3, elb using boto3
-s3 = boto3.resource('s3', region_name='us-east-1', aws_access_key_id='AKIAIDMH5U4PYNAACSKA',
-                    aws_secret_access_key='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')
-ec2 = boto3.resource('ec2', region_name='us-east-1', aws_access_key_id='AKIAIDMH5U4PYNAACSKA',
-                    aws_secret_access_key='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')
-lb = boto3.client('elb', region_name='us-east-1', aws_access_key_id='AKIAIDMH5U4PYNAACSKA',
-                    aws_secret_access_key='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')
-cloud = boto3.client('cloudwatch', region_name='us-east-1', aws_access_key_id='AKIAIDMH5U4PYNAACSKA',
-                     aws_secret_access_key='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')
+s3 = boto3.resource('s3')
+ec2 = boto3.resource('ec2')
+lb = boto3.client('elb')
+cloud = boto3.client('cloudwatch')
 
 
 @app.route('/')
