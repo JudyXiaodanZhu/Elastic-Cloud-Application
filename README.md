@@ -1,7 +1,7 @@
 # Elastic Cloud Application
 
 ## Introduction
-The purpose of this project is to developer an EC2 autoscaler that, in combination with AWS LBS, can self provision resources based on CPU usage. 
+The purpose of this project is to develop an EC2 autoscaler that, in combination with AWS LBS, can self provision resources based on CPU usage. 
 An application called Photo Gallary is developed to test the elasticity of my Authscaler. Details are explained below.
 
 ## Views
